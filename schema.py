@@ -43,9 +43,6 @@ class TeamsQuery(ObjectType):
 
         return conferences
 
-class GamesQuery(ObjectType):
-    pass
-
 class Game(ObjectType):
     gameId = String()
     gameWeekYear = String()
@@ -53,8 +50,7 @@ class Game(ObjectType):
     homeAbbreviation = String()
     visitorAbbreviation = String()
 
-
-class AllQuery(TeamsQuery, GamesQuery, ObjectType):
+class GamesQuery(ObjectType):
     byWeek = List(Game, week=String(default_value="2019-1"))
 
     def resolve_byWeek(parent, info, **kwargs):
@@ -81,5 +77,8 @@ class AllQuery(TeamsQuery, GamesQuery, ObjectType):
             )
 
         return games
+
+class AllQuery(TeamsQuery, GamesQuery, ObjectType):
+    pass
 
 schema = Schema(query=AllQuery)
