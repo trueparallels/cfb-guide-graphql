@@ -7,11 +7,15 @@ import json
 
 conferences_cache = {}
 teams_cache = []
+networks_cache = []
 
 class Conference(ObjectType):
     id = Decimal()
     name = String()
     parent_id = Decimal()
+
+class Network(ObjectType):
+    name = String()
 
 class Team(ObjectType):
     id = Decimal()
@@ -81,6 +85,7 @@ class Game(ObjectType):
     gameId = String()
     gameWeekYear = String()
     date = String()
+    network = String()
     home = String()
     visitor = String()
     homeAbbreviation = String()
@@ -117,6 +122,7 @@ class GamesQuery(ObjectType):
                     gameId=item['game_id'],
                     gameWeekYear=item['game_week_year'],
                     date=item['date'],
+                    network=item['network'],
                     homeAbbreviation=item['home_abbr'],
                     visitorAbbreviation=item['visitor_abbr'],
                     home=item['home'],
@@ -140,7 +146,18 @@ class TeamsQuery(ObjectType):
         
         return teams_cache
 
-class AllQuery(ConferenceQuery, GamesQuery, TeamsQuery, ObjectType):
+class NetworksQuery(ObjectType):
+    networks = List(Network)
+
+    def resolve_networks(parent, info, **kwargs):
+        global networks_cache
+        
+        if not len(networks_cache):
+            networks_cache = queries.get_networks()
+        
+        return networks_cache
+
+class AllQuery(ConferenceQuery, GamesQuery, TeamsQuery, NetworksQuery, ObjectType):
     pass
 
 schema = Schema(query=AllQuery)

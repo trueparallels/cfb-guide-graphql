@@ -25,3 +25,25 @@ def get_teams():
         teams.append(team)
 
     return teams
+
+def get_networks():
+    networks = {}
+
+    db = boto3.resource('dynamodb')
+    gamesTable = db.Table('cfb-guide-prod-games')
+
+    response = gamesTable.scan(
+        Select='SPECIFIC_ATTRIBUTES',
+        AttributesToGet=['network']
+    )
+
+    print(response['Items'])
+
+    for item in response['Items']:
+        network = schema.Network(
+            name=item['network']
+        )
+        print(network.name)
+        networks[network.name] = network
+
+    return networks.values()
