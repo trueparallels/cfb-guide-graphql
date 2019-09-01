@@ -9,6 +9,12 @@ conferences_cache = {}
 teams_cache = []
 networks_cache = []
 
+def get_final(item, team):
+    if 'home_final_score' in item or 'visitor_final_score' in item:
+        return decimal.Decimal(item['{}_final_score'.format(team)])
+
+    return None
+
 class Conference(ObjectType):
     id = Decimal()
     name = String()
@@ -93,6 +99,8 @@ class Game(ObjectType):
     isNeutralSite = Boolean()
     homeTeam = Field(Team)
     visitorTeam = Field(Team)
+    homeFinalScore = Decimal()
+    visitorFinalScore = Decimal()
 
 class GamesQuery(ObjectType):
     byWeek = List(Game, week=String(default_value="2019-1"))
@@ -115,8 +123,9 @@ class GamesQuery(ObjectType):
         )
 
         for item in response['Items']:
-            home_team = [team for team in teams_cache if team.abbreviation == item['home_abbr']]
-            visitor_team = [team for team in teams_cache if team.abbreviation == item['visitor_abbr']]
+            home_team = [team for team in teams_cache if team.id == item['home_team_id']]
+            visitor_team = [team for team in teams_cache if team.id == item['visitor_team_id']]
+            print(json.dumps(item, indent=4, default=str))
             games.append(
                 Game(
                     gameId=item['game_id'],
@@ -129,7 +138,9 @@ class GamesQuery(ObjectType):
                     visitor=item['visitor'],
                     isNeutralSite=item['neutral_site'],
                     homeTeam=home_team[0] if len(home_team) else None,
-                    visitorTeam=visitor_team[0] if len(visitor_team) else None
+                    visitorTeam=visitor_team[0] if len(visitor_team) else None,
+                    homeFinalScore=get_final(item, 'home'),
+                    visitorFinalScore=get_final(item, 'visitor')
                 )
             )
 

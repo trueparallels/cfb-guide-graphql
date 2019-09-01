@@ -37,13 +37,11 @@ def get_networks():
         AttributesToGet=['network']
     )
 
-    print(response['Items'])
-
     for item in response['Items']:
         network = schema.Network(
             name=item['network']
         )
-        print(network.name)
+
         networks[network.name] = network
 
     return networks.values()
