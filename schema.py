@@ -101,6 +101,7 @@ class Game(ObjectType):
     visitorTeam = Field(Team)
     homeFinalScore = Decimal()
     visitorFinalScore = Decimal()
+    headline = String()
 
 class GamesQuery(ObjectType):
     byWeek = List(Game, week=String(default_value="2019-1"))
@@ -132,6 +133,7 @@ class GamesQuery(ObjectType):
                     gameWeekYear=item['game_week_year'],
                     date=item['date'],
                     network=item['network'],
+                    headline=item['headline'] if 'headline' in item else None,
                     homeAbbreviation=item['home_abbr'],
                     visitorAbbreviation=item['visitor_abbr'],
                     home=item['home'],
