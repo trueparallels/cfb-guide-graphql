@@ -105,6 +105,52 @@ class Game(ObjectType):
 
 class GamesQuery(ObjectType):
     byWeek = List(Game, week=String(default_value="2019-1"))
+    allGamesByYear = List(Game, year=String(default_value="2020"))
+
+    def resolve_allGamesByYear(parent, info, **kwargs):
+        global teams_cache
+
+        year = kwargs.get('year')
+        year_filter = "{}-".format(year)
+
+        if not len(teams_cache):
+            teams_cache = queries.get_teams()
+
+        games = []
+
+        db = boto3.resource('dynamodb')
+        gamesTable = db.Table('cfb-guide-prod-games')
+
+        response = gamesTable.scan(
+            Select='ALL_ATTRIBUTES',
+            FilterExpression=Key('game_week_year').begins_with(year_filter)
+        )
+
+        for item in response['Items']:
+            home_team = [team for team in teams_cache if team.id == item['home_team_id']]
+            visitor_team = [team for team in teams_cache if team.id == item['visitor_team_id']]
+            print(json.dumps(item, indent=4, default=str))
+            games.append(
+                Game(
+                    gameId=item['game_id'],
+                    gameWeekYear=item['game_week_year'],
+                    date=item['date'],
+                    network=item['network'],
+                    headline=item['headline'] if 'headline' in item else None,
+                    homeAbbreviation=item['home_abbr'],
+                    visitorAbbreviation=item['visitor_abbr'],
+                    home=item['home'],
+                    visitor=item['visitor'],
+                    isNeutralSite=item['neutral_site'],
+                    homeTeam=home_team[0] if len(home_team) else None,
+                    visitorTeam=visitor_team[0] if len(visitor_team) else None,
+                    homeFinalScore=get_final(item, 'home'),
+                    visitorFinalScore=get_final(item, 'visitor')
+                )
+            )
+
+        return games
+
 
     def resolve_byWeek(parent, info, **kwargs):
         global teams_cache
