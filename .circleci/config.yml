@@ -14,6 +14,6 @@ workflows:
           requires:
             - aws-ecr/build-and-push-image
           aws-region: AWS_DEFAULT_REGION
-          family: "cfb-guide-graphql-family"
+          family: "cfb-guide-graphql-service"
           cluster-name: "cfb-guide-graphql-cluster"
           container-image-name-updates: "container=cfb-guide-graphql-service,tag=${CIRCLE_SHA1}"
