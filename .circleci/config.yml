@@ -1,19 +1,19 @@
 version: 2.1
 orbs:
-  aws-ecr: circleci/aws-ecr@0.0.10
-  aws-ecs: circleci/aws-ecs@0.0.8
+  aws-ecr: circleci/aws-ecr@6.7.0
+  aws-ecs: circleci/aws-ecs@1.1.0
 workflows:
   build-and-deploy:
     jobs:
-      - aws-ecr/build_and_push_image:
-          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
           repo: "cfb-guide-image-repo"
-          region: "${AWS_DEFAULT_REGION}"
-          tag: "${CIRCLE_SHA1}"
+          region: AWS_DEFAULT_REGION
+          tag: "${CIRCLE_SHA1},latest"
       - aws-ecs/deploy-service-update:
           requires:
-            - aws-ecr/build_and_push_image
-          aws-region: "${AWS_DEFAULT_REGION}"
+            - aws-ecr/build-and-push-image
+          aws-region: AWS_DEFAULT_REGION
           family: "cfb-guide-graphql-service"
           cluster-name: "cfb-guide-graphql-cluster"
           container-image-name-updates: "container=cfb-guide-graphql-service,tag=${CIRCLE_SHA1}"
