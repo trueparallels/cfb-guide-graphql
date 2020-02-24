@@ -91,6 +91,7 @@ class Game(ObjectType):
     gameId = String()
     gameWeekYear = String()
     date = String()
+    dateIsValid = Boolean()
     network = String()
     home = String()
     visitor = String()
@@ -135,6 +136,7 @@ class GamesQuery(ObjectType):
                     gameId=item['game_id'],
                     gameWeekYear=item['game_week_year'],
                     date=item['date'],
+                    dateIsValid=item['date_is_valid'] if 'date_is_valid' in item else None,
                     network=item['network'],
                     headline=item['headline'] if 'headline' in item else None,
                     homeAbbreviation=item['home_abbr'],
@@ -178,6 +180,7 @@ class GamesQuery(ObjectType):
                     gameId=item['game_id'],
                     gameWeekYear=item['game_week_year'],
                     date=item['date'],
+                    dateIsValid=item['date_is_valid'] if 'date_is_valid' in item else None,
                     network=item['network'],
                     headline=item['headline'] if 'headline' in item else None,
                     homeAbbreviation=item['home_abbr'],
