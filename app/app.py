@@ -4,7 +4,7 @@ from schema import schema
 from waitress import serve
 
 app = Flask(__name__)
-app.debug = True
+# app.debug = True
 
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 
