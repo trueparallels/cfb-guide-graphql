@@ -33,4 +33,5 @@ def ok():
 
 if __name__ == "__main__":
     app.logger.info("app started")
-    serve(app, host='0.0.0.0', port=3003)
+    start_port = 3003 if app.debug == True else 80
+    serve(app, host='0.0.0.0', port=start_port)
