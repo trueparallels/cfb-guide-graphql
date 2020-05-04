@@ -4,6 +4,7 @@ import boto3
 from boto3.dynamodb.conditions import Attr, Key
 import queries
 import json
+import logging
 
 conferences_cache = {}
 teams_cache = []
@@ -109,6 +110,7 @@ class GamesQuery(ObjectType):
     allGamesByYear = List(Game, year=String(default_value="2020"))
 
     def resolve_allGamesByYear(parent, info, **kwargs):
+        logging.getLogger('__main__').info("resolving allGamesByYear")
         global teams_cache
 
         year = kwargs.get('year')
@@ -130,7 +132,7 @@ class GamesQuery(ObjectType):
         for item in response['Items']:
             home_team = [team for team in teams_cache if team.id == item['home_team_id']]
             visitor_team = [team for team in teams_cache if team.id == item['visitor_team_id']]
-            print(json.dumps(item, indent=4, default=str))
+            # print(json.dumps(item, indent=4, default=str))
             games.append(
                 Game(
                     gameId=item['game_id'],
@@ -174,7 +176,7 @@ class GamesQuery(ObjectType):
         for item in response['Items']:
             home_team = [team for team in teams_cache if team.id == item['home_team_id']]
             visitor_team = [team for team in teams_cache if team.id == item['visitor_team_id']]
-            print(json.dumps(item, indent=4, default=str))
+            # print(json.dumps(item, indent=4, default=str))
             games.append(
                 Game(
                     gameId=item['game_id'],
